@@ -740,6 +740,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "simple_keylogger"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "lazy_static",
+ "lettre",
+ "lettre_email",
+ "rdev",
+]
+
+[[package]]
 name = "syn"
 version = "1.0.85"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -762,18 +773,6 @@ dependencies = [
  "redox_syscall",
  "remove_dir_all",
  "winapi",
-]
-
-[[package]]
-name = "test_intellij"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "lazy_static",
- "lettre",
- "lettre_email",
- "native-tls",
- "rdev",
 ]
 
 [[package]]

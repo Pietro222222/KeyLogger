@@ -11,7 +11,7 @@ use lettre_email::mime::TEXT_PLAIN;
 use lettre::{ClientSecurity, ClientTlsParameters, SmtpClient, SmtpTransport, Transport};
 use lettre::smtp::authentication::Credentials;
 use lettre::smtp::client::ClientCodec;
-use native_tls::TlsConnector;
+
 
 const FILENAME: &str = "keys.txt";
 

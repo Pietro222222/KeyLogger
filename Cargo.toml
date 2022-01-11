@@ -1,5 +1,5 @@
 [package]
-name = "test_intellij"
+name = "simple_keylogger"
 version = "0.1.0"
 edition = "2021"
 
@@ -11,4 +11,3 @@ lazy_static = "1.4.0"
 chrono = "0.4.19"
 lettre = "0.9.6"
 lettre_email = "0.9"
-native-tls = "0.2.8"
